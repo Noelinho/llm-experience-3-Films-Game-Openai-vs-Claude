@@ -1,0 +1,13 @@
+name: jtcsoft-films-game
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - openai
+  - anthropic
+  - markdown
+  - bs4
+  - pip:
+      - gradio
+      - python-dotenv
