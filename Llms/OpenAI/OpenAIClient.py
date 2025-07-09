@@ -7,23 +7,30 @@ class OpenAIClient:
         self.model = 'gpt-4o-mini'
         self.client = OpenAI()
 
-    def chat_host(self, past_messages: list) -> dict:
-        messages = [{"role": "system", "content": self.get_system_host_prompt()}]
-        for message in past_messages:
-            role = 'assistant'
-            if message['role'] != "host":
-                role = 'user'
+    def chat_host(self, past_messages: list):
+        messages_for_api = [{"role": "system", "content": self.get_system_host_prompt()}]
 
-            messages.append({"role": role, "content": f"{message['content']}"})
+        for msg in past_messages:
+            messages_for_api.append(msg)
 
-        response = self.client.chat.completions.create(
+        response_stream = self.client.chat.completions.create(
             model = self.model,
-            messages = messages
+            messages = messages_for_api,
+            stream=True
         )
 
-        return {
+        collected_content = ""
+        for chunk in response_stream:
+            if chunk.choices and chunk.choices[0].delta and chunk.choices[0].delta.content is not None:
+                collected_content += chunk.choices[0].delta.content
+                yield {
+                    "role": "assistant",  # El rol del host para Gradio/API
+                    "content": collected_content
+                }
+
+        yield {
             "role": "assistant",
-            "content": response.choices[0].message.content
+            "content": collected_content
         }
 
     def get_system_host_prompt(self) -> str:
@@ -31,4 +38,5 @@ class OpenAIClient:
                  pensado y que mediante pistas que te pida el usuario tratarás que adivine la película. \
                  No respondas a nada que no tenga que ver con el juego. \
                  Si ves que al usuario le cuesta adivinar la película le puedes decir el nombre del actor o actriz principal. \
-                 Comunícate con un tono desenfadado, estamos jugando. ")
+                 Comunícate con un tono desenfadado, estamos jugando.\
+                 Si el usuario acierta la película, le tienes que felicitar diciéndole: '¡Muy bien! Has acertado la película' y da por finalizado el juego. ")
