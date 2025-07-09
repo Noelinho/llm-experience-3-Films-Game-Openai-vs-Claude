@@ -26,7 +26,7 @@ def start_simulation(max_turns):
         if game_over:
             break
 
-        time.sleep(1)
+        time.sleep(2)
 
         for partial_player_response in claude_client.chat_player(conversation_history):
 
@@ -37,7 +37,7 @@ def start_simulation(max_turns):
 
             yield conversation_history
 
-        time.sleep(1)
+        time.sleep(2)
 
         for partial_host_response in open_ai_client.chat_host(conversation_history):
             if conversation_history and conversation_history[-1]["role"] == "assistant":
@@ -49,7 +49,7 @@ def start_simulation(max_turns):
 
             final_host_response = conversation_history[-1]["content"]
             if "¡muy bien! has acertado la película" in final_host_response.lower():
-                game_over = True  # El Host ha confirmado el fin del juego.
+                game_over = True
                 print("DEBUG: OpenAI ha confirmado el fin del juego. Bandera game_over activada.")
 
         yield conversation_history

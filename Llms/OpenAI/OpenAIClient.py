@@ -24,7 +24,7 @@ class OpenAIClient:
             if chunk.choices and chunk.choices[0].delta and chunk.choices[0].delta.content is not None:
                 collected_content += chunk.choices[0].delta.content
                 yield {
-                    "role": "assistant",  # El rol del host para Gradio/API
+                    "role": "assistant",
                     "content": collected_content
                 }
 

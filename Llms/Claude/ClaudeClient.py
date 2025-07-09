@@ -20,18 +20,18 @@ class ClaudeClient:
         with self.client.messages.stream(
             model=self.model,
             system=self.get_system_player_prompt(),
-            messages=messages_for_claude_api, # Usa los mensajes mapeados
+            messages=messages_for_claude_api,
             max_tokens=1000
         ) as stream:
             collected_content = ""
-            for chunk in stream:
-                for text in stream.text_stream:
-                    collected_content += text
 
-                    yield {
-                        "role": "user", #hay que engañar al sistema y hacer que claude devuelva como usuario ya que es a lo que juega
-                        "content": collected_content
-                    }
+            for text in stream.text_stream:
+                collected_content += text
+
+                yield {
+                    "role": "user",
+                    "content": collected_content
+                }
 
             yield {
                 "role": "user",
